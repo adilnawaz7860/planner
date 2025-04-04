@@ -1,0 +1,32 @@
+pipeline {
+  agent any
+
+  environment {
+    DOCKER_CREDENTIALS = credentials('dockerhub-creds')
+  }
+
+  stages {
+      stage('Clone Repository') {
+      steps {
+        git 'https://github.com/adilnawaz7860/planner'
+      }
+    }
+    stage('Docker Login') {
+      steps {
+        sh '''
+          echo "$DOCKER_CREDENTIALS_PSW" | docker login -u "$DOCKER_CREDENTIALS_USR" --password-stdin
+        '''
+      }
+    }
+
+    // Optional: build and push image
+    stage('Build & Push Docker Image') {
+      steps {
+        sh '''
+          docker build -t adil0786/planner .
+          docker push adil0786/planner
+        '''
+      }
+    }
+  }
+}
